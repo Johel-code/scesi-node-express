@@ -14,8 +14,12 @@ app.get('/healthy', (req, res) => {
     })
 });
 
+const SERVER_PORT = 3000
 
-
-app.listen(3000, () => {
-    console.log("server corriendo");
+app.listen(SERVER_PORT, (err, res) => {
+    if(err){
+        console.log(err);
+    }else{
+        console.log("server corriendo");
+    }
 });
