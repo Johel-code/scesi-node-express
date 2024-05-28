@@ -1,25 +1,23 @@
+require('dotenv').config();
 
 const express = require('express');
+const healthRoutes = require('./routes/healthyRoutes.js');
+
 const app = express();
+const port = process.env.PORT || 3005;
+
+app.use(express.json());
 
 app.get('/', (req, res) => {
     res.send("Welcome")
 });
 
-app.get('/healthy', (req, res) => {
-    res.status(200).json({
-        "healt": "live",
-        "status": 200,
-        "message": "ok"
-    })
-});
+app.use('/check', healthRoutes);
 
-const SERVER_PORT = 3000
-
-app.listen(SERVER_PORT, (err, res) => {
+app.listen(port, (err, res) => {
     if(err){
         console.log(err);
     }else{
-        console.log("server corriendo");
+        console.log('server corriendo en ' + port);
     }
 });
