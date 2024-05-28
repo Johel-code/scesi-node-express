@@ -1,4 +1,6 @@
-const getHealthStatusController = (req, res) => {
+import { Request, Response } from 'express';
+
+const getHealthStatusController = (req: Request, res: Response) => {
     res.status(200).json({
         "healt": "live",
         "status": 200,
@@ -6,6 +8,6 @@ const getHealthStatusController = (req, res) => {
     })
 }
 
-module.exports = {
+export {
     getHealthStatusController
-}
+};
