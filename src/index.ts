@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import express from 'express';
-import healthRoutes from './routes/healthyRoutes';
+import healthRoutes from '@routes/healthyRoutes';
 
 const app = express();
 const port = process.env.PORT || 3005;
