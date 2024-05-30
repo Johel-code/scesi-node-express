@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import ProductService from '@services/productService';
+import { validateProductCreateData, validateProductUpdateData } from '@/utils/validations';
 
 function getProducts (req: Request, res: Response) {
     const products = ProductService.getAllUsers();
@@ -20,7 +21,15 @@ function getProductById (req: Request, res: Response) {
 
 function createProduct (req: Request, res: Response) {
     const data = req.body;
-    //todo validar
+    
+    const { error } = validateProductCreateData(data)
+    if(error) {
+        return res.status(400).send({
+            "message": error.details[0].message,
+            "status": false
+        })
+    }
+
     const product = ProductService.createProduct(data)
     return res.status(201).json(product);
 }
@@ -35,7 +44,15 @@ function updateProduct (req: Request, res: Response) {
     }
 
     const data = req.body;
-    //todo validar
+    
+    const { error } = validateProductUpdateData(data)
+    if(error) {
+        return res.status(400).send({
+            message: error.details[0].message,
+            status: false
+        })
+    }
+
     product = ProductService.updateProduct(productId, data);
     return res.send(product)
 }

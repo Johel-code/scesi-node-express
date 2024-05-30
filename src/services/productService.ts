@@ -1,15 +1,7 @@
+import { Product } from '@models/Product'
 import products from '@assets/data.json';
 let productsData = products
 
-interface Product {
-    id: string
-    name: string
-    brand: string
-    stock: string
-    batch: string
-    expiration: string
-    discount: string 
-}
 
 function getAllUsers() {
     return productsData;
