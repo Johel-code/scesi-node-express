@@ -3,8 +3,34 @@ import products from '@assets/data.json';
 let productsData = products
 
 
-function getAllUsers() {
-    return productsData;
+function getAllUsers(
+    brand?: string,
+    stockover?: string, 
+    stockbelow?: string,
+    discountover?: string,
+    discountbelow?: string,
+    expireover?: string,
+    expirebelow?: string
+) {
+    if ((stockover && stockbelow) || (discountover && discountbelow) || (expireover && expirebelow)) {
+        throw new Error('Cannot filter by both "over" and "below" at the same time')
+    }
+
+    const stockOverNumber = stockover ? parseInt(stockover, 10) : null
+    const stockBelowNumber = stockbelow ? parseInt(stockbelow, 10) : null
+    const discountOverNumber = discountover ? parseInt(discountover, 10) : null
+    const discountBelowNumber = discountbelow ? parseInt(discountbelow, 10) : null
+    const expireOverDate = expireover ? new Date(expireover) : null
+    const expireBelowDate = expirebelow ? new Date(expirebelow) : null
+
+    return productsData
+        .filter(product => !brand || product.brand === brand)
+        .filter(product => !stockOverNumber || parseInt(product.stock, 10) >= stockOverNumber)
+        .filter(product => !stockBelowNumber || parseInt(product.stock, 10) <= stockBelowNumber)
+        .filter(product => !discountOverNumber || parseInt(product.discount, 10) >= discountOverNumber)
+        .filter(product => !discountBelowNumber || parseInt(product.discount, 10) <= discountBelowNumber)
+        .filter(product => !expireOverDate || new Date(product.expiration) >= expireOverDate)
+        .filter(product => !expireBelowDate || new Date(product.expiration) <= expireBelowDate)
 }
 
 function getById(id: string) {

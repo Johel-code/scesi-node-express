@@ -3,7 +3,16 @@ import ProductService from '@services/productService';
 import { validateProductCreateData, validateProductUpdateData } from '@/utils/validations';
 
 function getProducts (req: Request, res: Response) {
-    const products = ProductService.getAllUsers();
+    const { brand, stockover, stockbelow, discountover, discountbelow, expireover, expirebelow } = req.query
+    const products = ProductService.getAllUsers(
+        brand as string,
+        stockover as string, 
+        stockbelow as string,
+        discountover as string,
+        discountbelow as string,
+        expireover as string,
+        expirebelow as string
+    );
     return res.json(products);
 }
 
