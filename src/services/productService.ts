@@ -1,9 +1,7 @@
-import { Product } from '@models/Product'
-import products from '@assets/data.json';
-let productsData = products
+import { ProductDTO } from '@dtos/ProductDTO'
+import { prisma } from '@config/databaseConfig'
 
-
-function getAllUsers(
+async function getAllProducts(
     brand?: string,
     stockover?: string, 
     stockbelow?: string,
@@ -16,64 +14,70 @@ function getAllUsers(
         throw new Error('Cannot filter by both "over" and "below" at the same time')
     }
 
-    const stockOverNumber = stockover ? parseInt(stockover, 10) : null
-    const stockBelowNumber = stockbelow ? parseInt(stockbelow, 10) : null
-    const discountOverNumber = discountover ? parseInt(discountover, 10) : null
-    const discountBelowNumber = discountbelow ? parseInt(discountbelow, 10) : null
-    const expireOverDate = expireover ? new Date(expireover) : null
-    const expireBelowDate = expirebelow ? new Date(expirebelow) : null
+    const stockOverNumber = stockover ? parseInt(stockover, 10) : undefined
+    const stockBelowNumber = stockbelow ? parseInt(stockbelow, 10) : undefined
+    const discountOverNumber = discountover ? parseInt(discountover, 10) : undefined
+    const discountBelowNumber = discountbelow ? parseInt(discountbelow, 10) : undefined
+    const expireOverDate = expireover ? new Date(expireover) : undefined
+    const expireBelowDate = expirebelow ? new Date(expirebelow) : undefined
 
-    return productsData
-        .filter(product => !brand || product.brand === brand)
-        .filter(product => !stockOverNumber || parseInt(product.stock, 10) >= stockOverNumber)
-        .filter(product => !stockBelowNumber || parseInt(product.stock, 10) <= stockBelowNumber)
-        .filter(product => !discountOverNumber || parseInt(product.discount, 10) >= discountOverNumber)
-        .filter(product => !discountBelowNumber || parseInt(product.discount, 10) <= discountBelowNumber)
-        .filter(product => !expireOverDate || new Date(product.expiration) >= expireOverDate)
-        .filter(product => !expireBelowDate || new Date(product.expiration) <= expireBelowDate)
+    const products = await prisma.product.findMany({
+        where: {
+            ...(brand && { brand }),
+            ...(stockOverNumber !== undefined && { stock: { gte: stockOverNumber } }),
+            ...(stockBelowNumber !== undefined && { stock: { lte: stockBelowNumber } }),
+            ...(discountOverNumber !== undefined && { discount: { gte: discountOverNumber } }),
+            ...(discountBelowNumber !== undefined && { discount: { lte: discountBelowNumber } }),
+            ...(expireOverDate !== undefined && { expiration: { gte: expireOverDate } }),
+            ...(expireBelowDate !== undefined && { expiration: { lte: expireBelowDate } }),
+        }
+    })
+
+    return products
 }
 
-function getById(id: string) {
-    const product = productsData.find(product => product.id === id)
+async function getById(id: number) {
+    const product = await prisma.product.findUnique({
+        where: { id }
+    })
     return product
 }
 
-function createProduct(data: Product) {
-    data.id = productsData.length+1 + ""
-    productsData.push(data);
-    return productsData;
+async function createProduct(data: ProductDTO) {
+    const { name, brand, stock, batch, expiration, discount } = data
+    const createProduct = await prisma.product.create({
+        data: {
+            name,
+            brand,
+            stock,
+            batch,
+            expiration: new Date(expiration),
+            discount
+        }
+    })
+    return createProduct
 }
 
-function updateProduct(id: string, data: Partial<Product>) {
-    const productIndex = productsData.findIndex(product => product.id === id);
-
-    productsData[productIndex] = {
-        ...productsData[productIndex],
-        ...data
-    };
-
-    return productsData[productIndex];
-
-    // let updatedProduct
-
-    // productsData = productsData.map(product => {
-    //     if(product.id === id) {
-    //         updatedProduct = { ...product, ...data }
-    //         return updatedProduct
-    //     }
-    //     return product;
-    // })
-
-    // return updatedProduct;
+async function updateProduct(id: number, data: Partial<ProductDTO>) {
+    const updateProduct = prisma.product.update({
+        where: { id },
+        data: {
+            ...data,
+            ...(data.expiration && { expiration: new Date(data.expiration)})
+        }
+    })
+    return updateProduct
 }
 
-function deleteProduct(id: string) {
-    productsData = productsData.filter(product => product.id !== id)
-    return productsData;
+async function deleteProduct(id: number) {
+    const deleteProduct = await prisma.product.delete({
+        where: { id }
+    })
+    return deleteProduct
 }
 
 export default {
-    getAllUsers,
+    getAllProducts,
     getById,
     createProduct,
     updateProduct,
