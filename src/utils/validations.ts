@@ -1,30 +1,30 @@
 import Joi from 'joi'
-import { Product } from '@models/Product'
+import { ProductDTO } from '@dtos/ProductDTO'
 
-export const validateProductCreateData = (product: Product) => {
+export const validateProductCreateData = (product: ProductDTO) => {
 
-    const productCreateSchema = Joi.object<Product>({
-        id: Joi.string().required(),
+    const productCreateSchema = Joi.object<ProductDTO>({
+        // id: Joi.number().required(),
         name: Joi.string().min(2).max(30).required(),
         brand: Joi.string(),
-        stock: Joi.string(),
+        stock: Joi.number(),
         batch: Joi.string(),
-        expiration: Joi.string().min(5).max(10),
-        discount: Joi.string()
+        expiration: Joi.date(),
+        discount: Joi.number()
     })
 
     return productCreateSchema.validate(product)
 }
 
-export const validateProductUpdateData = (product: Partial<Product>) => {
+export const validateProductUpdateData = (product: Partial<ProductDTO>) => {
 
-    const productUpdateSchema = Joi.object<Partial<Product>> ({
+    const productUpdateSchema = Joi.object<Partial<ProductDTO>> ({
         name: Joi.string().min(2).max(30),
         brand: Joi.string(),
-        stock: Joi.string(),
+        stock: Joi.number(),
         batch: Joi.string(),
-        expiration: Joi.string().min(5).max(10),
-        discount: Joi.string()
+        expiration: Joi.date(),
+        discount: Joi.number()
     })
 
     return productUpdateSchema.validate(product)
